@@ -1,0 +1,23 @@
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
+
+void setup() {
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  
+  display.clearDisplay();
+  //rosto
+  display.drawCircle(64, 32, 25, WHITE);
+  //olhos
+  display.fillCircle(54, 24, 3, WHITE);
+  display.fillCircle(74, 24, 3, WHITE);
+  //sorriso
+  display.drawLine(54, 40, 64, 46, WHITE);
+  display.drawLine(64, 46, 74, 40, WHITE);
+
+  display.display();
+}
+
+void loop() {}
