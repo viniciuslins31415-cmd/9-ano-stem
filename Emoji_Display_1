@@ -1,0 +1,234 @@
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
+
+// ================= OLED =================
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+// ================= BLE =================
+
+#define SERVICE_UUID        "12345678-1234-1234-1234-123456789abc"
+#define CHARACTERISTIC_UUID "abcd1234-5678-90ab-cdef-123456789abc"
+
+BLECharacteristic *pCharacteristic;
+
+String recebido = "";
+
+// ================= EMOJIS =================
+
+// 😀 Feliz
+void emojiFeliz() {
+
+  display.clearDisplay();
+
+  display.drawCircle(64, 32, 25, WHITE);
+
+  display.fillCircle(54, 24, 3, WHITE);
+  display.fillCircle(74, 24, 3, WHITE);
+
+  display.drawLine(54, 40, 64, 46, WHITE);
+  display.drawLine(64, 46, 74, 40, WHITE);
+
+  display.display();
+}
+
+// ☹ Triste
+void emojiTriste() {
+
+  display.clearDisplay();
+
+  display.drawCircle(64, 32, 25, WHITE);
+
+  display.fillCircle(54, 24, 3, WHITE);
+  display.fillCircle(74, 24, 3, WHITE);
+
+  display.drawLine(54, 46, 64, 40, WHITE);
+  display.drawLine(64, 40, 74, 46, WHITE);
+
+  display.display();
+}
+
+// 😐 Neutro
+void emojiNeutro() {
+
+  display.clearDisplay();
+
+  display.drawCircle(64, 32, 25, WHITE);
+
+  display.fillCircle(54, 24, 3, WHITE);
+  display.fillCircle(74, 24, 3, WHITE);
+
+  display.drawLine(54, 42, 74, 42, WHITE);
+
+  display.display();
+}
+
+// 😎 Óculos
+void emojiOculos() {
+
+  display.clearDisplay();
+
+  display.drawCircle(64, 32, 25, WHITE);
+
+  display.fillRect(45, 20, 15, 10, WHITE);
+  display.fillRect(68, 20, 15, 10, WHITE);
+
+  display.drawLine(60, 25, 68, 25, WHITE);
+
+  display.drawLine(54, 40, 64, 46, WHITE);
+  display.drawLine(64, 46, 74, 40, WHITE);
+
+  display.display();
+}
+
+// 😮 Surpreso
+void emojiSurpreso() {
+
+  display.clearDisplay();
+      
+  display.drawCircle(64, 32, 25, WHITE);
+
+  display.fillCircle(54, 24, 3, WHITE);
+  display.fillCircle(74, 24, 3, WHITE);
+
+  display.drawCircle(64, 42, 6, WHITE);
+
+  display.display();
+}
+
+// 😴 Dormindo
+void emojiDormindo() {
+
+  display.clearDisplay();
+
+  display.drawCircle(64, 32, 25, WHITE);
+
+  display.drawLine(48, 24, 58, 24, WHITE);
+  display.drawLine(70, 24, 80, 24, WHITE);
+
+  display.drawCircle(64, 42, 5, WHITE);
+
+  display.setTextSize(2);
+  display.setCursor(90, 10);
+  display.print("Z");
+
+  display.display();
+}
+
+// ❤️ Coração
+void coracao() {
+
+  display.clearDisplay();
+
+  display.fillCircle(54, 24, 10, WHITE);
+  display.fillCircle(74, 24, 10, WHITE);
+
+  display.fillTriangle(44, 30, 84, 30, 64, 55, WHITE);
+
+  display.display();
+}
+
+// 🔥 Fogo
+void fogo() {
+
+  display.clearDisplay();
+
+  display.fillTriangle(64, 10, 40, 50, 88, 50, WHITE);
+
+  display.fillTriangle(64, 20, 50, 50, 78, 50, BLACK);
+
+  display.display();
+}
+
+// ⭐ Estrela
+void estrela() {
+
+  display.clearDisplay();
+
+  display.drawLine(64, 10, 70, 28, WHITE);
+  display.drawLine(70, 28, 90, 28, WHITE);
+  display.drawLine(90, 28, 74, 40, WHITE);
+  display.drawLine(74, 40, 80, 58, WHITE);
+  display.drawLine(80, 58, 64, 48, WHITE);
+  display.drawLine(64, 48, 48, 58, WHITE);
+  display.drawLine(48, 58, 54, 40, WHITE);
+  display.drawLine(54, 40, 38, 28, WHITE);
+  display.drawLine(38, 28, 58, 28, WHITE);
+  display.drawLine(58, 28, 64, 10, WHITE);
+
+  display.display();
+}
+
+// ================= CALLBACK BLE =================
+
+class MeuCallback: public BLECharacteristicCallbacks {
+
+  void onWrite(BLECharacteristic *pCharacteristic) {
+
+    recebido = pCharacteristic->getValue();
+
+    Serial.println(recebido);
+
+    //código para completar...
+};
+
+// ================= SETUP =================
+
+void setup() {
+
+  Serial.begin(115200);
+
+  Wire.begin(21, 22);
+
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+
+    Serial.println("OLED nao encontrado");
+
+    while(true);
+  }
+
+  display.clearDisplay();
+
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(10, 20);
+  display.println("ESP32");
+  display.display();
+
+  // BLE
+  BLEDevice::init("PainelEmoji");
+
+  BLEServer *pServer = BLEDevice::createServer();
+
+  BLEService *pService = pServer->createService(SERVICE_UUID);
+
+  pCharacteristic = pService->createCharacteristic(
+                      CHARACTERISTIC_UUID,
+                      BLECharacteristic::PROPERTY_WRITE
+                    );
+
+  pCharacteristic->setCallbacks(new MeuCallback());
+
+  pService->start();
+
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+
+  pAdvertising->start();
+
+  Serial.println("Bluetooth pronto!");
+}
+
+// ================= LOOP =================
+
+void loop() {
+
+}
