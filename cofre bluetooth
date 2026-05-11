@@ -57,6 +57,8 @@ class MinhaCaracteristica : public BLECharacteristicCallbacks {
       Serial.println(texto);
 
       //============= COMPLETE O CÓDIGO AQUI =========
+
+
     }
   }
 };
