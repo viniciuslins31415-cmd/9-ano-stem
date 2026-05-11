@@ -1,0 +1,104 @@
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
+
+#include <ESP32Servo.h>
+
+// ================= SERVO =================
+
+Servo servo;
+
+#define PINO_SERVO 13
+
+// ================= SENHA =================
+
+String senhaCorreta = "1234";
+
+// ================= BLE =================
+
+BLEServer* servidor = NULL;
+BLECharacteristic* caracteristica = NULL;
+
+bool conectado = false;
+
+// UUIDs (podem ser quaisquer valores)
+#define SERVICE_UUID        "12345678-1234-1234-1234-1234567890ab"
+#define CHARACTERISTIC_UUID "abcd1234-5678-90ab-cdef-1234567890ab"
+
+// ================= CALLBACK CONEXÃO =================
+
+class MeuServidor : public BLEServerCallbacks {
+
+  void onConnect(BLEServer* pServer) {
+    conectado = true;
+    Serial.println("📱 Celular conectado!");
+  }
+
+  void onDisconnect(BLEServer* pServer) {
+    conectado = false;
+    Serial.println("❌ Celular desconectado!");
+
+    BLEDevice::startAdvertising();
+  }
+};
+
+// ================= CALLBACK MENSAGEM =================
+
+class MinhaCaracteristica : public BLECharacteristicCallbacks {
+
+  void onWrite(BLECharacteristic *pCharacteristic) {
+
+    String texto = pCharacteristic->getValue();
+
+    if (texto.length() > 0) {
+
+      Serial.print("Senha recebida: ");
+      Serial.println(texto);
+
+      //============= COMPLETE O CÓDIGO AQUI =========
+    }
+  }
+};
+
+// ================= SETUP =================
+
+void setup() {
+
+  Serial.begin(115200);
+
+  // Servo
+  servo.attach(PINO_SERVO);
+
+  // Cofre começa fechado
+  servo.write(0);
+
+  // BLE
+  BLEDevice::init("CofreESP32");
+
+  servidor = BLEDevice::createServer();
+  servidor->setCallbacks(new MeuServidor());
+
+  BLEService *servico = servidor->createService(SERVICE_UUID);
+
+  caracteristica = servico->createCharacteristic(
+                      CHARACTERISTIC_UUID,
+                      BLECharacteristic::PROPERTY_WRITE
+                    );
+
+  caracteristica->setCallbacks(new MinhaCaracteristica());
+
+  servico->start();
+
+  BLEAdvertising *propaganda = BLEDevice::getAdvertising();
+  propaganda->start();
+
+  Serial.println("🔐 Cofre pronto!");
+  Serial.println("📲 Aguardando conexão...");
+}
+
+// ================= LOOP =================
+
+void loop() {
+
+}
