@@ -178,7 +178,42 @@ class MeuCallback: public BLECharacteristicCallbacks {
 
     Serial.println(recebido);
 
-    //código para completar...
+    if(recebido == "feliz") {
+      emojiFeliz();
+    }
+
+    else if(recebido == "triste") {
+      emojiTriste();
+    }
+
+    else if(recebido == "neutro") {
+      emojiNeutro();
+    }
+
+    else if(recebido == "oculos") {
+      emojiOculos();
+    }
+
+    else if(recebido == "surpreso") {
+      emojiSurpreso();
+    }
+
+    else if(recebido == "sono") {
+      emojiDormindo();
+    }
+
+    else if(recebido == "amor") {
+      coracao();
+    }
+
+    else if(recebido == "fogo") {
+      fogo();
+    }
+
+    else if(recebido == "estrela") {
+      estrela();
+    }
+  }
 };
 
 // ================= SETUP =================
