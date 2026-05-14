@@ -1,0 +1,54 @@
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
+
+#include "DHT.h"
+
+#define DHTPIN 4
+#define DHTTYPE DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
+
+// UUIDs BLE
+#define SERVICE_UUID        "12345678-1234-1234-1234-1234567890ab"
+#define CHARACTERISTIC_UUID "abcd1234-5678-90ab-cdef-1234567890ab"
+
+BLECharacteristic *pCharacteristic;
+
+void setup() {
+
+  Serial.begin(115200);
+
+  dht.begin();
+
+  // Nome BLE
+  BLEDevice::init("ESP32_DHT11");
+
+  // Cria servidor BLE
+  BLEServer *pServer = BLEDevice::createServer();
+
+  // Cria serviço
+  BLEService *pService = pServer->createService(SERVICE_UUID);
+
+  // Cria characteristic
+  pCharacteristic = pService->createCharacteristic(
+                      CHARACTERISTIC_UUID,
+                      BLECharacteristic::PROPERTY_READ |
+                      BLECharacteristic::PROPERTY_NOTIFY
+                    );
+
+  // Permite notificações
+  pCharacteristic->addDescriptor(new BLE2902());
+
+  // Inicia serviço
+  pService->start();
+
+  // Inicia anúncio BLE
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->start();
+
+  Serial.println("BLE iniciado"); 
+}
+
+// ======== COMPLETE COM O VOID LOOP ABAIXO =====
