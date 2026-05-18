@@ -16,6 +16,10 @@ Servo servo;
 #define LED_VERDE 26
 #define LED_VERMELHO 27
 
+// ================= BUZZER =================
+
+#define BUZZER 14
+
 // ================= SENHA =================
 
 String senhaCorreta = "1234";
