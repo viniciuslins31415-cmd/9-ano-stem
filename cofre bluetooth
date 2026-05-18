@@ -11,6 +11,11 @@ Servo servo;
 
 #define PINO_SERVO 13
 
+// ================= LEDS =================
+
+#define LED_VERDE 26
+#define LED_VERMELHO 27
+
 // ================= SENHA =================
 
 String senhaCorreta = "1234";
@@ -56,9 +61,23 @@ class MinhaCaracteristica : public BLECharacteristicCallbacks {
       Serial.print("Senha recebida: ");
       Serial.println(texto);
 
-      //============= COMPLETE O CÓDIGO AQUI =========
+      // se a senha é correta o cofre abre
+      if (texto == senhaCorreta) {
 
+        //==== COMPLETAR ===============
+      }
 
+      // senão, o cofre não abre
+      else {
+        Serial.println("Senha incorreta!");
+
+        // acende LED vermelho
+        digitalWrite(LED_VERMELHO, HIGH);
+        digitalWrite(LED_VERDE, LOW);
+        delay(3000);
+        // apaga LED vermelho
+        digitalWrite(LED_VERMELHO, LOW);
+      }
     }
   }
 };
@@ -74,6 +93,13 @@ void setup() {
 
   // Cofre começa fechado
   servo.write(0);
+
+  // LEDs
+  pinMode(LED_VERDE, OUTPUT);
+  pinMode(LED_VERMELHO, OUTPUT);
+
+  digitalWrite(LED_VERDE, LOW);
+  digitalWrite(LED_VERMELHO, LOW);
 
   // BLE
   BLEDevice::init("CofreESP32");
