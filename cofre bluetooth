@@ -102,6 +102,8 @@ void setup() {
   pinMode(LED_VERDE, OUTPUT);
   pinMode(LED_VERMELHO, OUTPUT);
 
+  pinMode(BUZZER, OUTPUT);
+
   digitalWrite(LED_VERDE, LOW);
   digitalWrite(LED_VERMELHO, LOW);
 
