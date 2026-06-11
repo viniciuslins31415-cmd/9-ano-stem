@@ -10,8 +10,71 @@ void setup() {
     pinMode(leds[i], OUTPUT);
     pinMode(botoes[i], INPUT_PULLUP);
   }
+
   pinMode(buzzer, OUTPUT);
   randomSeed(analogRead(A0));
 
   sequencia[0] = random(4);
+}
+
+void loop() {
+
+  // Mostra sequência
+  for (int i = 0; i < nivel; i++) {
+    digitalWrite(leds[sequencia[i]], HIGH);
+    tone(buzzer, 500 + sequencia[i] * 200);
+    delay(500);
+
+    digitalWrite(leds[sequencia[i]], LOW);
+    noTone(buzzer);
+    delay(250);
+  }
+
+  // Jogador repete
+  for (int i = 0; i < nivel; i++) {
+
+    int botao = -1;
+
+    while (botao == -1) {
+      for (int j = 0; j < 4; j++) {
+        if (digitalRead(botoes[j]) == LOW) {
+          botao = j;
+
+          digitalWrite(leds[j], HIGH);
+          tone(buzzer, 500 + j * 200);
+          delay(200);
+          digitalWrite(leds[j], LOW);
+          noTone(buzzer);
+
+          while (digitalRead(botoes[j]) == LOW);
+        }
+      }
+    }
+
+    if (botao != sequencia[i]) {
+
+      // Errou
+      for (int k = 0; k < 3; k++) {
+        tone(buzzer, 200);
+        delay(300);
+        noTone(buzzer);
+        delay(200);
+      }
+
+      nivel = 1;
+      sequencia[0] = random(4);
+      delay(1000);
+      return;
+    }
+  }
+
+  // Acertou
+  tone(buzzer, 1000);
+  delay(300);
+  noTone(buzzer);
+
+  sequencia[nivel] = random(4);
+  nivel++;
+
+  delay(1000);
 }
