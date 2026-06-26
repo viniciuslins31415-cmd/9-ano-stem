@@ -1,0 +1,35 @@
+int leds[] = {2,3,4,5,6,7,8,9};
+int botao = 10;
+
+void setup() {
+  for(int i=0;i<8;i++){
+    pinMode(leds[i], OUTPUT);
+  }
+  pinMode(botao, INPUT_PULLUP);
+
+  randomSeed(analogRead(A0));
+}
+
+void loop() {
+  if(digitalRead(botao) == LOW){
+
+    int voltas = random(20,40);
+    int tempo = 50;
+    int posicao = 0;
+
+    for(int i=0; i<voltas; i++){
+
+      for(int j=0;j<8;j++){
+        digitalWrite(leds[j], LOW);
+      }
+      digitalWrite(leds[posicao], HIGH);
+      delay(tempo);
+      posicao++;
+      if(posicao > 7){
+        posicao = 0;
+      }
+      tempo += 10;
+    }
+    delay(1000);
+  }
+}
